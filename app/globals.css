@@ -1,26 +1,121 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-bg: #080808;
+  --color-surface: #111111;
+  --color-surface-hover: #1a1a1a;
+  --color-border: #1f1f1f;
+  --color-accent: #f59e0b;
+  --color-accent-glow: rgba(245, 158, 11, 0.15);
+  --color-muted: #a1a1aa;
+  --color-heading: #fafafa;
+  --color-body: #d4d4d8;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --text-hero: 4.5rem;
+  --text-hero--line-height: 1.05;
+  --text-xxl: 3rem;
+  --text-xxl--line-height: 1.1;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
+  --animate-scramble: scramble 0.15s steps(1) infinite;
+  --radius-card: 1rem;
+  --radius-button: 0.75rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-20px) rotate(2deg); }
+  66% { transform: translateY(10px) rotate(-1deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px var(--color-accent-glow); }
+  50% { box-shadow: 0 0 40px var(--color-accent-glow); }
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) var(--color-bg);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-body);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+::view-transition-group(.blog-morph) {
+  animation-duration: 500ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-old(.blog-morph) {
+  animation: fade-out 300ms ease-out both;
+}
+
+::view-transition-new(.blog-morph) {
+  animation: fade-in 400ms ease-in 200ms both;
+}
+
+::view-transition-old(.nav-forward) {
+  animation: 200ms ease-in both slide-left-out,
+             200ms ease-in both fade-out;
+}
+
+::view-transition-new(.nav-forward) {
+  animation: 350ms ease-out 150ms both slide-left-in,
+             350ms ease-out 150ms both fade-in;
+}
+
+::view-transition-old(.nav-back) {
+  animation: 200ms ease-in both slide-right-out,
+             200ms ease-in both fade-out;
+}
+
+::view-transition-new(.nav-back) {
+  animation: 350ms ease-out 150ms both slide-right-in,
+             350ms ease-out 150ms both fade-in;
+}
+
+@keyframes fade-out {
+  to { opacity: 0; filter: blur(4px); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; filter: blur(4px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
+@keyframes slide-left-out {
+  to { transform: translateX(-40px); }
+}
+
+@keyframes slide-left-in {
+  from { transform: translateX(40px); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slide-right-out {
+  to { transform: translateX(40px); }
+}
+
+@keyframes slide-right-in {
+  from { transform: translateX(-40px); }
+  to { transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
 }
