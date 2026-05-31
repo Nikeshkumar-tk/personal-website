@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//home/nikeshkumartk/projects/personal-website/**)",
+      "Read(///wsl.localhost/Ubuntu/home/nikeshkumartk/projects/personal-website/**)",
+      "Read(//mnt/c/Users/**)",
+      "Read(///wsl.localhost/Ubuntu/home/nikeshkumartk/projects/personal-website/node_modules/next/**)",
+      "Read(///wsl.localhost/Ubuntu/home/nikeshkumartk/projects/**)",
+      "Bash(pnpm build *)",
+      "Bash(wsl -d Ubuntu -- bash -lc \"cd /home/nikeshkumartk/projects/personal-website && pnpm build 2>&1 | tail -120\")",
+      "Bash(wsl -d Ubuntu -- bash -lc \"cd /home/nikeshkumartk/projects/personal-website && pnpm lint 2>&1 | tail -60\")",
+      "Bash(wsl -d Ubuntu -- bash -lc \"cd /home/nikeshkumartk/projects/personal-website && pnpm build 2>&1 | tail -40\")"
+    ]
+  }
+}

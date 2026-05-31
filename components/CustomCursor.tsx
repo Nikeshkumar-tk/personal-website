@@ -1,67 +1,64 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
 
+const HOVER_SELECTOR = 'a, button, [data-cursor-hover]'
+
+// Touch detection via useSyncExternalStore — never changes after mount,
+// so the subscribe callback is a no-op.
+const noopSubscribe = () => () => {}
+const getIsTouchSnapshot = () =>
+  'ontouchstart' in window || navigator.maxTouchPoints > 0
+const getIsTouchServerSnapshot = () => false
+
 export function CustomCursor() {
+  const isTouch = useSyncExternalStore(
+    noopSubscribe,
+    getIsTouchSnapshot,
+    getIsTouchServerSnapshot,
+  )
   const [isHovering, setIsHovering] = useState(false)
   const [isHidden, setIsHidden] = useState(true)
-  const [isTouch, setIsTouch] = useState(false)
   const cursorX = useMotionValue(-100)
   const cursorY = useMotionValue(-100)
   const springX = useSpring(cursorX, { stiffness: 500, damping: 28 })
   const springY = useSpring(cursorY, { stiffness: 500, damping: 28 })
 
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
+  useEffect(() => {
+    if (isTouch) return
+
+    let hidden = true
+
+    const handleMouseMove = (e: MouseEvent) => {
       cursorX.set(e.clientX)
       cursorY.set(e.clientY)
-      if (isHidden) setIsHidden(false)
-    },
-    [cursorX, cursorY, isHidden],
-  )
+      if (hidden) {
+        hidden = false
+        setIsHidden(false)
+      }
+    }
 
-  const handleMouseEnter = useCallback(() => setIsHovering(true), [])
-  const handleMouseLeave = useCallback(() => setIsHovering(false), [])
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target as Element | null
+      if (target?.closest?.(HOVER_SELECTOR)) setIsHovering(true)
+    }
 
-  useEffect(() => {
-    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-      setIsTouch(true)
-      return
+    const handleMouseOut = (e: MouseEvent) => {
+      const target = e.target as Element | null
+      if (target?.closest?.(HOVER_SELECTOR)) setIsHovering(false)
     }
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
-
-    const interactiveElements = document.querySelectorAll(
-      'a, button, [data-cursor-hover]',
-    )
-    interactiveElements.forEach((el) => {
-      el.addEventListener('mouseenter', handleMouseEnter)
-      el.addEventListener('mouseleave', handleMouseLeave)
-    })
-
-    const observer = new MutationObserver(() => {
-      const updated = document.querySelectorAll(
-        'a, button, [data-cursor-hover]',
-      )
-      updated.forEach((el) => {
-        el.removeEventListener('mouseenter', handleMouseEnter)
-        el.removeEventListener('mouseleave', handleMouseLeave)
-        el.addEventListener('mouseenter', handleMouseEnter)
-        el.addEventListener('mouseleave', handleMouseLeave)
-      })
-    })
-    observer.observe(document.body, { childList: true, subtree: true })
+    document.addEventListener('mouseover', handleMouseOver, { passive: true })
+    document.addEventListener('mouseout', handleMouseOut, { passive: true })
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
-      observer.disconnect()
-      document.querySelectorAll('a, button, [data-cursor-hover]').forEach((el) => {
-        el.removeEventListener('mouseenter', handleMouseEnter)
-        el.removeEventListener('mouseleave', handleMouseLeave)
-      })
+      document.removeEventListener('mouseover', handleMouseOver)
+      document.removeEventListener('mouseout', handleMouseOut)
     }
-  }, [handleMouseMove, handleMouseEnter, handleMouseLeave])
+  }, [isTouch, cursorX, cursorY])
 
   if (isTouch) return null
 
@@ -88,7 +85,7 @@ export function CustomCursor() {
       transition={{ duration: 0.2, ease: 'easeOut' }}
     >
       <div
-        className="rounded-full border absolute inset-0"
+        className="absolute inset-0 rounded-full border"
         style={{ borderColor: 'inherit', backgroundColor: 'inherit' }}
       />
       <motion.span

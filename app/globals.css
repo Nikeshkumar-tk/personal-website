@@ -10,11 +10,13 @@
   --color-muted: #a1a1aa;
   --color-heading: #fafafa;
   --color-body: #d4d4d8;
+  --color-code-bg: #0c0c0c;
+  --color-code-border: #1a1a1a;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --text-hero: 4.5rem;
+  --text-hero: clamp(2.5rem, 9vw, 4.5rem);
   --text-hero--line-height: 1.05;
-  --text-xxl: 3rem;
+  --text-xxl: clamp(2rem, 6vw, 3rem);
   --text-xxl--line-height: 1.1;
   --animate-float: float 6s ease-in-out infinite;
   --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
@@ -39,11 +41,23 @@
   scrollbar-color: var(--color-border) var(--color-bg);
 }
 
+html {
+  /* Prevent iOS Safari from auto-zooming on focused form controls */
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   background: var(--color-bg);
   color: var(--color-body);
   font-family: var(--font-sans);
   overflow-x: hidden;
+}
+
+/* Inputs at 16px or above prevent iOS Safari from auto-zooming on focus */
+input,
+textarea,
+select {
+  font-size: 16px;
 }
 
 ::selection {

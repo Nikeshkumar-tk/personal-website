@@ -1,3 +1,18 @@
+export type BlogBlock =
+  | { type: 'paragraph'; text: string }
+  | { type: 'heading'; level: 2 | 3; text: string; id?: string }
+  | { type: 'code'; language: string; code: string; filename?: string }
+  | {
+      type: 'image'
+      src: string
+      alt: string
+      caption?: string
+      width?: number
+      height?: number
+    }
+  | { type: 'quote'; text: string; cite?: string }
+  | { type: 'list'; ordered?: boolean; items: string[] }
+
 export interface BlogPost {
   slug: string
   title: string
@@ -5,7 +20,8 @@ export interface BlogPost {
   date: string
   tags: string[]
   coverImage: string
-  body: string[]
+  body: BlogBlock[]
+  readingTimeMinutes?: number
 }
 
 export interface CareerStep {
@@ -13,13 +29,6 @@ export interface CareerStep {
   title: string
   company: string
   description: string
-}
-
-export interface Dream {
-  title: string
-  description: string
-  emoji: string
-  span: 'sm' | 'md' | 'lg'
 }
 
 export interface SocialLink {
@@ -33,7 +42,6 @@ export interface PersonalData {
   tagline: string
   bio: string
   career: CareerStep[]
-  dreams: Dream[]
   socials: SocialLink[]
   email: string
 }

@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { ViewTransition } from 'react'
 import { motion } from 'framer-motion'
 import type { BlogPost } from '@/lib/types'
+import { getReadingTime } from '@/lib/readingTime'
 
 interface BlogCardProps {
   post: BlogPost
@@ -11,6 +13,8 @@ interface BlogCardProps {
 }
 
 export function BlogCard({ post, featured = false }: BlogCardProps) {
+  const readingTime = getReadingTime(post)
+
   return (
     <Link href={`/blog/${post.slug}`} className="group block" data-cursor-hover>
       <ViewTransition
@@ -19,17 +23,24 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
         enter={{ default: 'none' }}
         exit={{ default: 'none' }}
       >
-        <article className="relative overflow-hidden rounded-card border border-border bg-surface hover:bg-surface-hover transition-colors duration-300">
+        <article className="relative overflow-hidden rounded-card border border-border bg-surface transition-colors duration-300 hover:bg-surface-hover">
           <div className="aspect-[16/10] overflow-hidden">
-            <motion.img
-              src={post.coverImage}
-              alt={post.title}
-              className="w-full h-full object-cover"
+            <motion.div
+              className="h-full w-full"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-            />
+            >
+              <Image
+                src={post.coverImage}
+                alt={post.title}
+                width={800}
+                height={500}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                className="h-full w-full object-cover"
+              />
+            </motion.div>
           </div>
-          <div className="p-5 space-y-3">
+          <div className="space-y-3 p-4 sm:p-5">
             <div className="flex items-center gap-3">
               {post.tags.slice(0, 2).map((tag) => (
                 <span
@@ -39,7 +50,7 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
                   {tag}
                 </span>
               ))}
-              <span className="text-xs text-muted ml-auto">
+              <span className="ml-auto text-xs text-muted">
                 {new Date(post.date).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
@@ -48,14 +59,17 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
               </span>
             </div>
             <h3
-              className={`font-semibold text-heading tracking-tight group-hover:text-accent transition-colors duration-200 ${
+              className={`font-semibold tracking-tight text-heading transition-colors duration-200 group-hover:text-accent ${
                 featured ? 'text-xl' : 'text-lg'
               }`}
             >
               {post.title}
             </h3>
-            <p className="text-sm text-muted leading-relaxed line-clamp-2">
+            <p className="line-clamp-2 text-sm leading-relaxed text-muted">
               {post.excerpt}
+            </p>
+            <p className="text-[11px] uppercase tracking-widest text-muted/70">
+              {readingTime} min read
             </p>
           </div>
         </article>

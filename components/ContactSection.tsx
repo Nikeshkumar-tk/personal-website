@@ -59,18 +59,18 @@ export function ContactSection({ email, socials }: ContactSectionProps) {
   )
 
   return (
-    <section id="contact" className="py-32 px-6">
+    <section id="contact" className="px-5 py-20 sm:px-6 sm:py-32">
       <div className="mx-auto max-w-6xl">
         <ScrollReveal>
-          <h2 className="text-xxl font-bold text-heading tracking-tight mb-4">
+          <h2 className="mb-4 text-xxl font-bold tracking-tight text-heading">
             Reach Out
           </h2>
-          <p className="text-muted text-lg max-w-lg mb-16">
+          <p className="mb-10 max-w-lg text-base text-muted sm:mb-16 sm:text-lg">
             Got a project in mind? Want to collaborate? Or just want to say hi? I&apos;d love to hear from you.
           </p>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-16">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-5 lg:gap-16">
           <div className="lg:col-span-3">
             <ScrollReveal>
               <form id="contact-form" action={formAction} className="space-y-5">
@@ -178,7 +178,7 @@ export function ContactSection({ email, socials }: ContactSectionProps) {
                 </h3>
                 <a
                   href={`mailto:${email}`}
-                  className="text-lg font-medium text-heading hover:text-accent transition-colors"
+                  className="break-all text-base font-medium text-heading transition-colors hover:text-accent sm:text-lg"
                   data-cursor-hover
                 >
                   {email}

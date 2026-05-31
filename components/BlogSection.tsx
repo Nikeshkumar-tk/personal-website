@@ -4,19 +4,21 @@ import { BlogCard } from './BlogCard'
 import { blogPosts } from '@/data/blogs'
 
 export function BlogSection() {
-  const featuredPosts = blogPosts.slice(0, 3)
+  const featuredPosts = [...blogPosts]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 3)
 
   return (
-    <section id="blog" className="py-32 px-6 bg-surface">
+    <section id="blog" className="bg-surface px-5 py-20 sm:px-6 sm:py-32">
       <div className="mx-auto max-w-6xl">
         <ScrollReveal>
-          <div className="flex items-end justify-between mb-16">
+          <div className="mb-10 flex items-end justify-between sm:mb-16">
             <div>
-              <h2 className="text-xxl font-bold text-heading tracking-tight mb-4">
+              <h2 className="mb-4 text-xxl font-bold tracking-tight text-heading">
                 Latest Writing
               </h2>
-              <p className="text-muted text-lg max-w-lg">
-                Thoughts on engineering, design, and the craft of building software.
+              <p className="max-w-lg text-base text-muted sm:text-lg">
+                Notes on serverless, AWS, TypeScript, and shipping software that lasts.
               </p>
             </div>
             <Link

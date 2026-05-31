@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useSyncExternalStore } from 'react'
 import { motion } from 'framer-motion'
 
 const columns = 24
@@ -30,7 +30,8 @@ function CodeRain() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    let animationId: number
+    let animationId: number | null = null
+    let isVisible = true
     const drops: { x: number; y: number; speed: number; chars: string[] }[] = []
 
     const resize = () => {
@@ -81,15 +82,46 @@ function CodeRain() {
       animationId = requestAnimationFrame(draw)
     }
 
-    draw()
+    const start = () => {
+      if (animationId == null) draw()
+    }
+    const stop = () => {
+      if (animationId != null) {
+        cancelAnimationFrame(animationId)
+        animationId = null
+      }
+    }
+
+    // Pause when scrolled off-screen — the canvas is anchored to the hero,
+    // so once you've moved past it the rAF loop is pure waste.
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting
+        if (isVisible) start()
+        else stop()
+      },
+      { threshold: 0 },
+    )
+    observer.observe(canvas)
+
+    // Also pause when the tab is hidden
+    const onVisibility = () => {
+      if (document.hidden) stop()
+      else if (isVisible) start()
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    start()
 
     return () => {
-      cancelAnimationFrame(animationId)
+      stop()
+      observer.disconnect()
       window.removeEventListener('resize', resize)
+      document.removeEventListener('visibilitychange', onVisibility)
     }
   }, [])
 
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+  return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 }
 
 function BracketParticle({
@@ -109,7 +141,7 @@ function BracketParticle({
 }) {
   return (
     <motion.span
-      className="absolute text-muted select-none font-mono"
+      className="absolute select-none font-mono text-muted"
       style={{
         left: `${x}%`,
         top: `${y}%`,
@@ -134,9 +166,34 @@ function BracketParticle({
   )
 }
 
+function subscribeMatchMedia(query: string) {
+  return (callback: () => void) => {
+    const mq = window.matchMedia(query)
+    mq.addEventListener('change', callback)
+    return () => mq.removeEventListener('change', callback)
+  }
+}
+
+function getMatchMediaSnapshot(query: string) {
+  return () => window.matchMedia(query).matches
+}
+
+// Stable references — useSyncExternalStore requires identity-stable args
+const subscribeDesktop = subscribeMatchMedia('(min-width: 640px)')
+const getDesktopSnapshot = getMatchMediaSnapshot('(min-width: 640px)')
+const getDesktopServerSnapshot = () => false
+
 export function CodeBackground() {
+  // Canvas rain burns battery on mobile and is invisible at scale-down.
+  // Render guide grid + bracket particles always; skip rain below 640px.
+  const enableRain = useSyncExternalStore(
+    subscribeDesktop,
+    getDesktopSnapshot,
+    getDesktopServerSnapshot,
+  )
+
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
       {/* Dot grid — architectural blueprint feel */}
       <div
         className="absolute inset-0 opacity-[0.03]"
@@ -149,21 +206,19 @@ export function CodeBackground() {
 
       {/* Architectural guide lines */}
       <div className="absolute inset-0 opacity-[0.015]">
-        <div className="absolute top-0 left-[10%] w-px h-full bg-accent" />
-        <div className="absolute top-0 left-[25%] w-px h-full bg-accent" />
-        <div className="absolute top-0 left-[50%] w-px h-full bg-accent" />
-        <div className="absolute top-0 left-[75%] w-px h-full bg-accent" />
-        <div className="absolute top-0 left-[90%] w-px h-full bg-accent" />
-        <div className="absolute top-[20%] left-0 w-full h-px bg-accent" />
-        <div className="absolute top-[40%] left-0 w-full h-px bg-accent" />
-        <div className="absolute top-[60%] left-0 w-full h-px bg-accent" />
-        <div className="absolute top-[80%] left-0 w-full h-px bg-accent" />
+        <div className="absolute left-[10%] top-0 h-full w-px bg-accent" />
+        <div className="absolute left-[25%] top-0 h-full w-px bg-accent" />
+        <div className="absolute left-[50%] top-0 h-full w-px bg-accent" />
+        <div className="absolute left-[75%] top-0 h-full w-px bg-accent" />
+        <div className="absolute left-[90%] top-0 h-full w-px bg-accent" />
+        <div className="absolute left-0 top-[20%] h-px w-full bg-accent" />
+        <div className="absolute left-0 top-[40%] h-px w-full bg-accent" />
+        <div className="absolute left-0 top-[60%] h-px w-full bg-accent" />
+        <div className="absolute left-0 top-[80%] h-px w-full bg-accent" />
       </div>
 
-      {/* Falling code rain */}
-      <CodeRain />
+      {enableRain && <CodeRain />}
 
-      {/* Floating bracket particles */}
       {bracketParticles.map((p, i) => (
         <BracketParticle key={i} {...p} />
       ))}

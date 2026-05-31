@@ -33,14 +33,14 @@ function CareerStepItem({
 
   return (
     <motion.div style={{ opacity }} className="relative">
-      <div className="absolute -left-[45px] top-2 w-4 h-4 rounded-full border-2 border-accent bg-bg z-10" />
+      <div className="absolute -left-[37px] top-2 z-10 h-3.5 w-3.5 rounded-full border-2 border-accent bg-bg sm:-left-[45px] sm:h-4 sm:w-4" />
       <div className="space-y-1">
-        <span className="text-accent font-mono text-sm font-medium">
+        <span className="font-mono text-xs font-medium text-accent sm:text-sm">
           {step.year}
         </span>
-        <h3 className="text-xl font-semibold text-heading">{step.title}</h3>
+        <h3 className="text-lg font-semibold text-heading sm:text-xl">{step.title}</h3>
         <p className="text-sm text-muted">{step.company}</p>
-        <p className="text-sm text-body leading-relaxed max-w-md pt-1">
+        <p className="max-w-md pt-1 text-sm leading-relaxed text-body">
           {step.description}
         </p>
       </div>
@@ -63,28 +63,28 @@ export function CareerTimeline({ steps }: CareerTimelineProps) {
       id="career"
       ref={containerRef}
       className="relative"
-      style={{ height: `${steps.length * 100 + 100}vh` }}
+      style={{ height: `${steps.length * 75 + 50}vh` }}
     >
-      <div className="sticky top-0 h-screen flex items-center overflow-hidden">
-        <div className="mx-auto max-w-6xl w-full px-6">
+      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+        <div className="mx-auto w-full max-w-6xl px-5 sm:px-6">
           <ScrollReveal>
-            <h2 className="text-xxl font-bold text-heading tracking-tight mb-4">
+            <h2 className="mb-4 text-xxl font-bold tracking-tight text-heading">
               Career Journey
             </h2>
-            <p className="text-muted text-lg max-w-lg mb-16">
+            <p className="mb-10 max-w-lg text-base text-muted sm:mb-16 sm:text-lg">
               A timeline of where I&apos;ve been and what I&apos;ve built along the way.
             </p>
           </ScrollReveal>
 
           <div className="relative">
-            <div className="absolute left-[7px] top-0 bottom-0 w-px bg-border">
+            <div className="absolute bottom-0 left-[6px] top-0 w-px bg-border sm:left-[7px]">
               <motion.div
-                className="absolute top-0 left-0 w-full bg-accent"
+                className="absolute left-0 top-0 w-full bg-accent"
                 style={{ height: lineHeight }}
               />
             </div>
 
-            <div className="space-y-16 pl-12">
+            <div className="space-y-12 pl-10 sm:space-y-16 sm:pl-12">
               {steps.map((step, i) => (
                 <CareerStepItem
                   key={step.year}
